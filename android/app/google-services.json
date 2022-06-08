@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "833787090603",
+    "firebase_url": "https://scooter-drive-default-rtdb.firebaseio.com",
+    "project_id": "scooter-drive",
+    "storage_bucket": "scooter-drive.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833787090603:android:9b1441518b255684e109ee",
+        "android_client_info": {
+          "package_name": "us.dreamhacks.skdrive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "833787090603-35mn0c3rkosjmd8e2ntl99c1cgvbdi4g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgAHadiXN5BFmcmN0dE-WxqDeBtef-c0g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "833787090603-35mn0c3rkosjmd8e2ntl99c1cgvbdi4g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833787090603:android:f95f2264fdadcda2e109ee",
+        "android_client_info": {
+          "package_name": "us.dreamhacks.us_drive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "833787090603-35mn0c3rkosjmd8e2ntl99c1cgvbdi4g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgAHadiXN5BFmcmN0dE-WxqDeBtef-c0g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "833787090603-35mn0c3rkosjmd8e2ntl99c1cgvbdi4g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
