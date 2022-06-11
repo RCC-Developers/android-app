@@ -2,9 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+// ignore: unused_import
+import 'package:us_drive/assistants/assistant_methods.dart';
+// ignore: unused_import
 import 'package:us_drive/authentication/login_screen.dart';
 
 import 'package:us_drive/global/global.dart';
+import 'package:us_drive/widgets/my_drawer.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -19,6 +23,8 @@ class _MainScreenState extends State<MainScreen> {
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
+
+  GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
 
   blackThemeGoogleMap() {
     newGoogleMapController!.setMapStyle('''
@@ -187,8 +193,26 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: sKey,
+      drawer: Container(
+        width: 250,
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors.green,
+          ),
+          child: MyDrawer(
+            name: userModelCurrentInfo!.name,
+            email: userModelCurrentInfo!.email,
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           GoogleMap(
@@ -202,6 +226,23 @@ class _MainScreenState extends State<MainScreen> {
               //for black theme google map
               blackThemeGoogleMap();
             },
+          ),
+          //custom hamburger button for drawer
+          Positioned(
+            top: 26,
+            left: 5,
+            child: GestureDetector(
+              onTap: () {
+                sKey.currentState!.openDrawer();
+              },
+              child: const CircleAvatar(
+                backgroundColor: Colors.green,
+                child: Icon(
+                  Icons.menu,
+                  color: Colors.indigoAccent,
+                ),
+              ),
+            ),
           ),
         ],
       ),
