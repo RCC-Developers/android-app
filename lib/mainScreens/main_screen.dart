@@ -1,19 +1,26 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:us_drive/assistants/assistant_methods.dart';
+import 'package:us_drive/assistants/geofire_assistant.dart';
 import 'package:us_drive/authentication/login_screen.dart';
 import 'package:us_drive/global/global.dart';
 import 'package:us_drive/infoHandler/app_info.dart';
 import 'package:us_drive/mainScreens/search_places_screen.dart';
+import 'package:us_drive/mainScreens/select_nearest_active_driver_screen.dart';
+import 'package:us_drive/models/active_nearby_available_drivers.dart';
 import 'package:us_drive/widgets/my_drawer.dart';
 import 'package:us_drive/widgets/progress_dialog.dart';
+
+import '../main.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -44,10 +51,15 @@ class _MainScreenState extends State<MainScreen> {
   Set<Marker> markersSet = {};
   Set<Circle> circlesSet = {};
 
-  String userName = "Your Name";
-  String userEmail = "Your Email";
+  String userName = "your Name";
+  String userEmail = "your Email";
 
   bool openNavigationDrawer = true;
+
+  bool activeNearbyDriverKeysLoaded = false;
+  BitmapDescriptor? activeNearbyIcon;
+
+  List<ActiveNearbyAvailableDrivers> onlineNearByAvailableDriversList = [];
 
   blackThemeGoogleMap() {
     newGoogleMapController!.setMapStyle('''
@@ -244,6 +256,8 @@ class _MainScreenState extends State<MainScreen> {
 
     userName = userModelCurrentInfo!.name!;
     userEmail = userModelCurrentInfo!.email!;
+
+    initializeGeoFireListener();
   }
 
   @override
@@ -253,8 +267,61 @@ class _MainScreenState extends State<MainScreen> {
     checkIfLocationPermissionAllowed();
   }
 
+  saveRideRequestInformation() {
+    //1. save the RideRequest Information
+
+    onlineNearByAvailableDriversList =
+        GeoFireAssistant.activeNearbyAvailableDriversList;
+    searchNearestOnlineDrivers();
+  }
+
+  searchNearestOnlineDrivers() async {
+    //no active driver available
+    if (onlineNearByAvailableDriversList.length == 0) {
+      //cancel/delete the RideRequest Information
+
+      setState(() {
+        polyLineSet.clear();
+        markersSet.clear();
+        circlesSet.clear();
+        pLineCoOrdinatesList.clear();
+      });
+
+      Fluttertoast.showToast(
+          msg:
+              "No Online Nearest Driver Available. Search Again after some time, Restarting App Now.");
+
+      Future.delayed(const Duration(milliseconds: 4000), () {
+        MyApp.restartApp(context);
+      });
+
+      return;
+    }
+
+    //active driver available
+    await retrieveOnlineDriversInformation(onlineNearByAvailableDriversList);
+
+    Navigator.push(context,
+        MaterialPageRoute(builder: (c) => SelectNearestActiveDriversScreen()));
+  }
+
+  retrieveOnlineDriversInformation(List onlineNearestDriversList) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref().child("drivers");
+    for (int i = 0; i < onlineNearestDriversList.length; i++) {
+      await ref
+          .child(onlineNearestDriversList[i].driverId.toString())
+          .once()
+          .then((dataSnapshot) {
+        var driverKeyInfo = dataSnapshot.snapshot.value;
+        dList.add(driverKeyInfo);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    createActiveNearByDriverIconMarker();
+
     return Scaffold(
       key: sKey,
       drawer: Container(
@@ -310,7 +377,7 @@ class _MainScreenState extends State<MainScreen> {
                 }
               },
               child: CircleAvatar(
-                backgroundColor: Colors.grey,
+                backgroundColor: Colors.green,
                 child: Icon(
                   openNavigationDrawer ? Icons.menu : Icons.close,
                   color: Colors.black54,
@@ -368,7 +435,7 @@ class _MainScreenState extends State<MainScreen> {
                                                 .locationName!)
                                             .substring(0, 24) +
                                         "..."
-                                    : "Not getting address",
+                                    : "Not Getting Address💔",
                                 style: const TextStyle(
                                     color: Colors.grey, fontSize: 14),
                               ),
@@ -429,7 +496,7 @@ class _MainScreenState extends State<MainScreen> {
                                       ? Provider.of<AppInfo>(context)
                                           .userDropOffLocation!
                                           .locationName!
-                                      : "Where to go?",
+                                      : "Where to go?☺️",
                                   style: const TextStyle(
                                       color: Colors.grey, fontSize: 14),
                                 ),
@@ -453,7 +520,16 @@ class _MainScreenState extends State<MainScreen> {
                         child: const Text(
                           "Request a Ride",
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          if (Provider.of<AppInfo>(context, listen: false)
+                                  .userDropOffLocation !=
+                              null) {
+                            saveRideRequestInformation();
+                          } else {
+                            Fluttertoast.showToast(
+                                msg: "Please select destination location");
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                             primary: Colors.green,
                             textStyle: const TextStyle(
@@ -592,5 +668,102 @@ class _MainScreenState extends State<MainScreen> {
       circlesSet.add(originCircle);
       circlesSet.add(destinationCircle);
     });
+  }
+
+  initializeGeoFireListener() {
+    Geofire.initialize("activeDrivers");
+
+    Geofire.queryAtLocation(
+            userCurrentPosition!.latitude, userCurrentPosition!.longitude, 10)!
+        .listen((map) {
+      print(map);
+      if (map != null) {
+        var callBack = map['callBack'];
+
+        //latitude will be retrieved from map['latitude']
+        //longitude will be retrieved from map['longitude']
+
+        switch (callBack) {
+          //whenever any driver become active/online
+          case Geofire.onKeyEntered:
+            ActiveNearbyAvailableDrivers activeNearbyAvailableDriver =
+                ActiveNearbyAvailableDrivers();
+            activeNearbyAvailableDriver.locationLatitude = map['latitude'];
+            activeNearbyAvailableDriver.locationLongitude = map['longitude'];
+            activeNearbyAvailableDriver.driverId = map['key'];
+            GeoFireAssistant.activeNearbyAvailableDriversList
+                .add(activeNearbyAvailableDriver);
+            if (activeNearbyDriverKeysLoaded == true) {
+              displayActiveDriversOnUsersMap();
+            }
+            break;
+
+          //whenever any driver become non-active/offline
+          case Geofire.onKeyExited:
+            GeoFireAssistant.deleteOfflineDriverFromList(map['key']);
+            displayActiveDriversOnUsersMap();
+            break;
+
+          //whenever driver moves - update driver location
+          case Geofire.onKeyMoved:
+            ActiveNearbyAvailableDrivers activeNearbyAvailableDriver =
+                ActiveNearbyAvailableDrivers();
+            activeNearbyAvailableDriver.locationLatitude = map['latitude'];
+            activeNearbyAvailableDriver.locationLongitude = map['longitude'];
+            activeNearbyAvailableDriver.driverId = map['key'];
+            GeoFireAssistant.updateActiveNearbyAvailableDriverLocation(
+                activeNearbyAvailableDriver);
+            displayActiveDriversOnUsersMap();
+            break;
+
+          //display those online/active drivers on user's map
+          case Geofire.onGeoQueryReady:
+            activeNearbyDriverKeysLoaded = true;
+            displayActiveDriversOnUsersMap();
+            break;
+        }
+      }
+
+      setState(() {});
+    });
+  }
+
+  displayActiveDriversOnUsersMap() {
+    setState(() {
+      markersSet.clear();
+      circlesSet.clear();
+
+      Set<Marker> driversMarkerSet = Set<Marker>();
+
+      for (ActiveNearbyAvailableDrivers eachDriver
+          in GeoFireAssistant.activeNearbyAvailableDriversList) {
+        LatLng eachDriverActivePosition =
+            LatLng(eachDriver.locationLatitude!, eachDriver.locationLongitude!);
+
+        Marker marker = Marker(
+          markerId: MarkerId("driver" + eachDriver.driverId!),
+          position: eachDriverActivePosition,
+          icon: activeNearbyIcon!,
+          rotation: 360,
+        );
+
+        driversMarkerSet.add(marker);
+      }
+
+      setState(() {
+        markersSet = driversMarkerSet;
+      });
+    });
+  }
+
+  createActiveNearByDriverIconMarker() {
+    if (activeNearbyIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: const Size(2, 2));
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "images/car.png")
+          .then((value) {
+        activeNearbyIcon = value;
+      });
+    }
   }
 }
