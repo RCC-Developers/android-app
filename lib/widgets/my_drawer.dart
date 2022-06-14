@@ -21,15 +21,15 @@ class _MyDrawerState extends State<MyDrawer> {
           //drawer header
           Container(
             height: 165,
-            color: Colors.black,
+            color: Colors.grey,
             child: DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.blue),
+              decoration: const BoxDecoration(color: Colors.black),
               child: Row(
                 children: [
                   const Icon(
                     Icons.person,
                     size: 80,
-                    color: Colors.white,
+                    color: Colors.grey,
                   ),
                   const SizedBox(
                     width: 16,
@@ -76,7 +76,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               title: Text(
                 "History",
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white54),
               ),
             ),
           ),
@@ -90,7 +90,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               title: Text(
                 "Visit Profile",
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white54),
               ),
             ),
           ),
@@ -103,8 +103,8 @@ class _MyDrawerState extends State<MyDrawer> {
                 color: Colors.white54,
               ),
               title: Text(
-                "About app",
-                style: TextStyle(color: Colors.black),
+                "About",
+                style: TextStyle(color: Colors.white54),
               ),
             ),
           ),
@@ -118,11 +118,11 @@ class _MyDrawerState extends State<MyDrawer> {
             child: const ListTile(
               leading: Icon(
                 Icons.logout,
-                color: Colors.red,
+                color: Colors.white54,
               ),
               title: Text(
                 "Sign Out",
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white54),
               ),
             ),
           ),

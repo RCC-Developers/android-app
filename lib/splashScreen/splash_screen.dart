@@ -9,7 +9,7 @@ class MySplashScreen extends StatefulWidget {
   const MySplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<MySplashScreen> createState() => _MySplashScreenState();
+  _MySplashScreenState createState() => _MySplashScreenState();
 }
 
 class _MySplashScreenState extends State<MySplashScreen> {
@@ -17,7 +17,8 @@ class _MySplashScreenState extends State<MySplashScreen> {
     fAuth.currentUser != null
         ? AssistantMethods.readCurrentOnlineUserInfo()
         : null;
-    Timer(const Duration(seconds: 5), () async {
+
+    Timer(const Duration(seconds: 3), () async {
       if (await fAuth.currentUser != null) {
         currentFirebaseUser = fAuth.currentUser;
         Navigator.push(
@@ -32,6 +33,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
   @override
   void initState() {
     super.initState();
+
     startTimer();
   }
 
@@ -49,10 +51,10 @@ class _MySplashScreenState extends State<MySplashScreen> {
                 height: 10,
               ),
               const Text(
-                "scooter android & iso app",
+                "Scooter & inDriver  App",
                 style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.blue,
+                    fontSize: 14,
+                    color: Colors.green,
                     fontWeight: FontWeight.bold),
               ),
             ],
