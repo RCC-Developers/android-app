@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
+import 'package:us_drive/assistants/assistant_methods.dart';
 import 'package:us_drive/global/global.dart';
 
 class SelectNearestActiveDriversScreen extends StatefulWidget {
@@ -13,6 +14,38 @@ class SelectNearestActiveDriversScreen extends StatefulWidget {
 
 class _SelectNearestActiveDriversScreenState
     extends State<SelectNearestActiveDriversScreen> {
+  String fareAmount = "";
+
+  getFareAmountAccordingToVehicleType(int index) {
+    if (tripDirectionDetailsInfo != null) {
+      if (dList[index]["car_details"]["type"].toString() == "Kick-Scooter") {
+        fareAmount =
+            (AssistantMethods.calculateFareAmountFromOriginToDestination(
+                        tripDirectionDetailsInfo!) /
+                    2)
+                .toStringAsFixed(1);
+      }
+      if (dList[index]["car_details"]["type"].toString() ==
+          "Kick-Scooter") //means executive type of car - more comfortable pro level
+      {
+        fareAmount =
+            (AssistantMethods.calculateFareAmountFromOriginToDestination(
+                        tripDirectionDetailsInfo!) *
+                    2)
+                .toStringAsFixed(1);
+      }
+      if (dList[index]["car_details"]["type"].toString() ==
+          "Kick-Scooter") // non - executive car - comfortable
+      {
+        fareAmount =
+            (AssistantMethods.calculateFareAmountFromOriginToDestination(
+                    tripDirectionDetailsInfo!))
+                .toString();
+      }
+    }
+    return fareAmount;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,8 +116,8 @@ class _SelectNearestActiveDriversScreenState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "3",
-                    style: TextStyle(
+                    "\$ " + getFareAmountAccordingToVehicleType(index),
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -92,8 +125,22 @@ class _SelectNearestActiveDriversScreenState
                     height: 2,
                   ),
                   Text(
-                    "13 km",
-                    style: TextStyle(
+                    tripDirectionDetailsInfo != null
+                        ? tripDirectionDetailsInfo!.duration_text!
+                        : "",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                        fontSize: 12),
+                  ),
+                  const SizedBox(
+                    height: 2,
+                  ),
+                  Text(
+                    tripDirectionDetailsInfo != null
+                        ? tripDirectionDetailsInfo!.distance_text!
+                        : "",
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black54,
                         fontSize: 12),

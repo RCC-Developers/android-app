@@ -6,7 +6,7 @@
 
 
    <application
-        android:label="us_drive"
+        android:label="uscooter"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

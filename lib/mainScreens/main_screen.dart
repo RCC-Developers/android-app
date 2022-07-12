@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:us_drive/assistants/assistant_methods.dart';
 import 'package:us_drive/assistants/geofire_assistant.dart';
+// ignore: unused_import
 import 'package:us_drive/authentication/login_screen.dart';
 import 'package:us_drive/global/global.dart';
 import 'package:us_drive/infoHandler/app_info.dart';
@@ -22,6 +23,7 @@ import 'package:us_drive/widgets/progress_dialog.dart';
 
 import '../main.dart';
 
+// ignore: use_key_in_widget_constructors
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -377,7 +379,7 @@ class _MainScreenState extends State<MainScreen> {
                 }
               },
               child: CircleAvatar(
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.grey,
                 child: Icon(
                   openNavigationDrawer ? Icons.menu : Icons.close,
                   color: Colors.black54,
@@ -435,7 +437,7 @@ class _MainScreenState extends State<MainScreen> {
                                                 .locationName!)
                                             .substring(0, 24) +
                                         "..."
-                                    : "Not Getting Address💔",
+                                    : "not getting address",
                                 style: const TextStyle(
                                     color: Colors.grey, fontSize: 14),
                               ),
@@ -496,7 +498,7 @@ class _MainScreenState extends State<MainScreen> {
                                       ? Provider.of<AppInfo>(context)
                                           .userDropOffLocation!
                                           .locationName!
-                                      : "Where to go?☺️",
+                                      : "Where to go?",
                                   style: const TextStyle(
                                       color: Colors.grey, fontSize: 14),
                                 ),
@@ -567,6 +569,9 @@ class _MainScreenState extends State<MainScreen> {
     var directionDetailsInfo =
         await AssistantMethods.obtainOriginToDestinationDirectionDetails(
             originLatLng, destinationLatLng);
+    setState(() {
+      tripDirectionDetailsInfo = directionDetailsInfo;
+    });
 
     Navigator.pop(context);
 
@@ -760,7 +765,7 @@ class _MainScreenState extends State<MainScreen> {
     if (activeNearbyIcon == null) {
       ImageConfiguration imageConfiguration =
           createLocalImageConfiguration(context, size: const Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, "images/car.png")
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "images/crx.png")
           .then((value) {
         activeNearbyIcon = value;
       });

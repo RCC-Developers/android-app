@@ -13,7 +13,7 @@ void main() async {
       child: ChangeNotifierProvider(
         create: (context) => AppInfo(),
         child: MaterialApp(
-          title: 'users App',
+          title: 'User-App',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),

@@ -51,7 +51,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
                 height: 10,
               ),
               const Text(
-                "Scooter & inDriver  App",
+                "ScooterUser Android App",
                 style: TextStyle(
                     fontSize: 14,
                     color: Colors.green,
