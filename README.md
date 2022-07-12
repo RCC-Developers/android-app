@@ -4,7 +4,7 @@ The project is still in development,
 
 <p align="center">
   <img src="images/flutter_01.png" width="350" >
-  <img src="images/flutter_02.png" width="350" >
+  
   <img src="images/flutter_03.png" width="350" >
 </p>
 
