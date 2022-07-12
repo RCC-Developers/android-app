@@ -1,6 +1,7 @@
 # Flutter Drive Android App
 
 The project is still in development,
+I'm still Learning flutter 
 
 <p align="center">
   <img src="images/flutter_01.png" width="350" >
